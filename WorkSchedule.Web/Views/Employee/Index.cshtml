@@ -1,0 +1,91 @@
+﻿@using WorkSchedule.Data.Entities;
+@using WorkSchedule.Web.Models;
+@using System.Collections.Generic;
+
+@{
+    ViewBag.Title = "Employee List";
+}
+
+@model PageResult<Employee>;
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Home</a> / <span>@ViewBag.Title</span>
+</div>
+<h2>Employees</h2>
+<p>
+    <span>
+    @Html.ActionLink("Add Employee", "New")
+    </span>
+</p>
+
+@if(Model.Results.Count() > 0) 
+{
+<form asp-action="Index" asp-controller="Employee" method="post">
+    <table class="table table-hover table-striped table-bordered table-light">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Home Phone</th>
+            <th scope="col">Action</th>
+        </tr>
+        @foreach (var employee in Model.Results)
+        {
+            <tr>
+                <td scope="row">@employee.ID</td>
+                <td>@employee.LastName</td>
+                <td>@employee.FirstName</td>
+                <td>@employee.HomePhone</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "Employee", new { id=employee.ID}, new {@class="btn btn-info"})
+                    @Html.ActionLink("Delete", "Delete", "Employee", new { id=employee.ID }, new {@class="btn btn-danger"})
+                </td>
+                
+            </tr>
+
+        }
+    </table>
+
+    <p>Showing @Model.Results.Count() out of @Model.RowCount results</p>
+    
+    <div aria-label="Page navigation example" class="form-row align-items-center">
+        <div class="col-auto my-1">
+            @Html.DropDownListFor(p => p.PageSize, new SelectList(new List<int> {10, 20, 30, 40, 50, 100}), new {@class="custom-select mr-sm-2", @id="inlineFormCustomSelect", @onchange="PagerClick(1)"})
+        </div>
+        <div class="col-auto my-1">
+            <ul class="pagination" style="margin: 0">
+                @for (int pageIndex = 1; pageIndex <= Model.PageCount; pageIndex++)
+                {
+
+                    @if (pageIndex != Model.CurrentPage)
+                    {
+
+                        <li class="page-item"><a class="page-link" href="javascript:PagerClick(@pageIndex);">@pageIndex</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item active">
+                            <a class="page-link" href="#">@pageIndex <span class="sr-only">(current)</span></a>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+    <input type="hidden" id="currentPageIndex" name="currentPageIndex" />
+    <input type="hidden" id="pageSize" name="pageSize" />
+</form>
+
+<script type="text/javascript">
+    function PagerClick(index) {
+        document.getElementById("currentPageIndex").value = index;
+        document.getElementById("pageSize").value = document.getElementById("inlineFormCustomSelect").value;
+        document.forms[0].submit();
+    }
+</script>
+}
+else
+{
+    <p>No employees found.</p>
+}
+

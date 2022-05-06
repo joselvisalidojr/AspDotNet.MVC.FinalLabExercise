@@ -1,0 +1,115 @@
+﻿@using Microsoft.AspNetCore.Http
+@using WorkSchedule.Data.Entities
+@using Newtonsoft.Json;
+@model WorkSchedule.Data.Entities.Employee
+
+@{
+    var action = ViewData["Action"];
+}
+
+@if (ViewBag.Error != null)
+{
+    <script type="text/javascript">
+        alert("@ViewBag.Error");
+    </script>
+}
+<div>
+    <div>
+        <a asp-controller="Home" asp-action="Index">Home</a> 
+        /
+        <a asp-controller="Employee" asp-action="Index">Employee</a>
+        /
+        <span>@action Employee</span>
+    </div>
+    <h2 style="margin-bottom:1.5em">@action Employee</h2>
+    <form asp-controller="employee" asp-action="save" method="post">
+        @Html.Hidden("action",action)
+        <table class="table table-borderless">
+            @if(action != null  && action.ToString().ToLower().Equals("edit"))
+            {
+                <tr>
+                    <td>ID</td>
+                    <td>
+                        <input asp-for="ID" type="hidden"/>
+                        @Model.ID
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>First Name</td>
+                <td>
+                    <input class="form-control" style="width:250px" asp-for="FirstName" />
+                    <span class="text-danger" asp-validation-for="FirstName"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td>
+                    <input class="form-control" style="width:250px" asp-for="LastName" />
+                    <span class="text-danger" asp-validation-for="LastName"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Home Phone</td>
+                <td>
+                    <input class="form-control" style="width:250px" asp-for="HomePhone" />
+                    <span class="text-danger" asp-validation-for="HomePhone"></span>
+                </td>
+            </tr>
+
+            @if(action != null  && action.ToString().ToLower().Equals("edit"))
+            {
+                <tr>
+                <td>Skills</td>
+                <td>
+                @if(ViewBag.Skills.Count > 0)
+                {
+                    foreach(var skill in ViewBag.Skills)
+                    {
+                        <span>@skill.SkillDescription</span>
+                        <br />
+                    }
+                }else
+                {
+                    <span>No skills found.</span>
+                }
+                </td>
+            </tr>
+            <tr>
+            
+                <td>
+                </td>
+                <td>
+                     <select class="form-control" style="width:250px" id="SkillsDropdown" name = "SkillsDropdown">
+                                @foreach(var item in ViewBag.SkillList)
+                                {   
+                                    <option value = "@item.ID">@item.Description</option>
+                                }
+                     </select>   
+                     <input type="button" onclick="addNewSkill()" value="AddNewSkill" class="btn btn-primary" />
+                </td>
+            </tr>
+            }
+            <input asp-for="Active" type="hidden" value=true />
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <input type="submit" value="Save" class="btn btn-success"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <script type="text/javascript">
+        function addNewSkill() {
+
+            var e = document.getElementById("SkillsDropdown");
+            console.log(@Model.ID + " " + e.value);
+            window.location.href ="/employees/AddSkill?EmployeeId="+@Model.ID+"&SkillId="+ e.value;
+        }
+    </script>
+</div>
+
